@@ -1,6 +1,6 @@
-import playwright from "playwright";
+import playwright, { type Locator } from "playwright";
 
-const getRows = async (table) => {
+const getRows = async (table: Locator) => {
   const rowsSelector = await table.locator("tbody > tr").all();
 
   const rows = [];
@@ -77,8 +77,8 @@ export const getInvoices = async () => {
 
     const getPaginatorValues = async () => {
       const currentPaginator = footer.locator(".ui-paginator-current");
-      const paginatorValues = await currentPaginator.textContent(); //(1 of 1)
-      const match = paginatorValues.match(/\((\d+)\s+of\s+(\d+)\)/);
+      const paginatorValues = (await currentPaginator.textContent()) as string; //(1 of 1)
+      const match = paginatorValues.match(/\((\d+)\s+of\s+(\d+)\)/) || [];
       const current = parseInt(match[1], 10);
       let total = parseInt(match[2], 10);
 
@@ -102,9 +102,9 @@ export const getInvoices = async () => {
     const result = [];
 
     for (const row of rows) {
-      const obj = {};
+      const obj = {} as Record<string, string>;
       for (let i = 0; i < row.length; i++) {
-        obj[keys[i]] = row[i];
+        obj[keys[i] as string] = row[i] as string;
       }
       result.push(obj);
     }

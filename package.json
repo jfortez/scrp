@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch --env-file=.env src/index.js"
+    "dev": "tsx watch --env-file=.env src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -13,5 +13,10 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.45.1",
     "playwright": "^1.45.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.2.0",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4"
   }
 }
