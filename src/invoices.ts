@@ -20,7 +20,9 @@ const getRows = async (table: Locator) => {
     const rowData = [];
     for (const cell of cells) {
       const text = await cell.textContent();
-      rowData.push(text);
+      if (text) {
+        rowData.push(text);
+      }
     }
     rows.push(rowData);
   }
@@ -35,11 +37,18 @@ const getTableData = async (page: Page): Promise<InvoiceJSON[]> => {
     await submitBtn.click();
 
     const noDataMessage = page.locator('[id="formMessages:messages"]');
-    if (await noDataMessage.isVisible()) {
+    const hasWarning = await noDataMessage.isVisible();
+    if (hasWarning) {
       return [];
     }
 
-    await page.waitForSelector('[id="frmPrincipal:tablaCompRecibidos"]');
+    const tableSelector = '[id="frmPrincipal:tablaCompRecibidos"]';
+    const isTableVisible = await page.isVisible(tableSelector);
+
+    if (!isTableVisible) {
+      return [];
+    }
+
     const table = page.locator('[id="frmPrincipal:tablaCompRecibidos"] > table');
     const footer = table.locator("tfoot > tr > td");
 
