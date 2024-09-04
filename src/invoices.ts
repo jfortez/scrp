@@ -30,6 +30,16 @@ const getRows = async (table: Locator) => {
   return rows;
 };
 
+const getPaginatorValues = async (footer: Locator) => {
+  const currentPaginator = footer.locator(".ui-paginator-current");
+  const paginatorValues = (await currentPaginator.textContent()) as string; //(1 of 1)
+  const match = paginatorValues.match(/\((\d+)\s+of\s+(\d+)\)/) || [];
+  const current = parseInt(match[1], 10);
+  let total = parseInt(match[2], 10);
+
+  return { current, total };
+};
+
 const getTableData = async (page: Page): Promise<InvoiceJSON[]> => {
   try {
     const submitBtn = page.getByRole("button", { name: "Consultar" });
@@ -57,24 +67,14 @@ const getTableData = async (page: Page): Promise<InvoiceJSON[]> => {
     const paginatorSelect = footer.locator("select");
     await paginatorSelect.selectOption("75");
 
-    const getPaginatorValues = async () => {
-      const currentPaginator = footer.locator(".ui-paginator-current");
-      const paginatorValues = (await currentPaginator.textContent()) as string; //(1 of 1)
-      const match = paginatorValues.match(/\((\d+)\s+of\s+(\d+)\)/) || [];
-      const current = parseInt(match[1], 10);
-      let total = parseInt(match[2], 10);
-
-      return { current, total };
-    };
-
     const rows = [...(await getRows(table))];
 
-    let paginatorValues = await getPaginatorValues();
+    let paginatorValues = await getPaginatorValues(footer);
     const nextBtn = footer.locator(".ui-paginator-next");
 
     while (paginatorValues.current < paginatorValues.total) {
       await nextBtn.click();
-      paginatorValues = await getPaginatorValues();
+      paginatorValues = await getPaginatorValues(footer);
       await page.waitForTimeout(100);
 
       rows.push(...(await getRows(table)));
