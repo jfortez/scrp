@@ -1,4 +1,16 @@
-import playwright, { type Locator, type Page } from "playwright";
+import { type Locator, type Page, type LaunchOptions } from "playwright";
+import { firefox } from "playwright-extra";
+
+import plugin from "puppeteer-extra-plugin-recaptcha";
+
+firefox.use(
+  plugin({
+    provider: {
+      id: "2captcha",
+      token: process.env.RECAPTCHA_TOKEN,
+    },
+  })
+);
 
 type InvoiceJSON = {
   "RUC y Razón social emisor": string;
@@ -45,6 +57,13 @@ const getTableData = async (page: Page): Promise<InvoiceJSON[]> => {
     const submitBtn = page.getByRole("button", { name: "Consultar" });
 
     await submitBtn.click();
+
+    await page.waitForTimeout(300);
+    const iframeLocator = page.locator('iframe[title*="reCAPTCHA"]');
+    if (await iframeLocator.isVisible()) {
+      const res = await page.solveRecaptchas();
+      console.log(res);
+    }
 
     const noDataMessage = page.locator('[id="formMessages:messages"]');
     const hasWarning = await noDataMessage.isVisible();
@@ -101,10 +120,10 @@ const getTableData = async (page: Page): Promise<InvoiceJSON[]> => {
   }
 };
 export const getInvoices = async () => {
-  const launchOptions: playwright.LaunchOptions = {
+  const launchOptions: LaunchOptions = {
     headless: false,
   };
-  const browser = await playwright.firefox.launch(launchOptions);
+  const browser = await firefox.launch(launchOptions);
 
   const page = await browser.newPage();
   await page.goto("https://srienlinea.sri.gob.ec/sri-en-linea/inicio/NAT");

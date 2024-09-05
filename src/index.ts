@@ -5,6 +5,8 @@ import supabase from "./database";
 import { Tables } from "./database.types";
 import { writeFile } from "fs/promises";
 
+// import { firefox } from "playwright-extra";
+
 const lookUp: Record<string, string | string[]> = {
   "RUC y Razón social emisor": ["ruc", "entity"],
   "Tipo y serie de comprobante": "type_serie",
@@ -79,3 +81,30 @@ const PORT = process.env.PORT || 3000;
 server.listen(+PORT, () => {
   console.log("Server running on port", PORT);
 });
+
+// const main = async () => {
+//   const browser = await firefox.launch({ headless: false });
+
+//   const page = await browser.newPage();
+
+//   // Navigate to target URL and wait for Captcha to load
+//   await page.goto("https://2captcha.com/demo/recaptcha-v2", { waitUntil: "networkidle" });
+
+//   // The single line of code to solve reCaptchas
+//   await page.solveRecaptchas();
+
+//   // Click the Check button
+//   await page.click("text=Check");
+//   // Wait a few seconds
+//   await page.waitForTimeout(5000);
+
+//   console.log("Taking a screenshot...");
+
+//   // Take a screenshot and save to project folder
+//   await page.screenshot({ path: "screenshot.png", fullPage: true });
+
+//   console.log("Screenshot saved");
+//   await browser.close();
+// };
+
+// main();

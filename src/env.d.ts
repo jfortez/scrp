@@ -6,6 +6,7 @@ declare global {
       RUC: string;
       PASSWORD: string;
       PORT: string;
+      RECAPTCHA_TOKEN: string;
     }
   }
 }
